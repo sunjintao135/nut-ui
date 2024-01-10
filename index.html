@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+	<title>消防栓检查</title>
+
+	<!-- 引入样式文件 -->
+	<link rel="stylesheet" href="https://cdn.staticfile.org/vant/2.13.2/index.min.css">
+
+	<!-- 自定义样式 -->
+	<style>
+		body {
+			color: #333;
+			background-color: #f8f8f8;
+		}
+
+		.succ {
+			color: forestgreen;
+		}
+
+		.cros {
+			color: red;
+		}
+
+		.succCell {
+			background-color: #34e91e22;
+			border: 1px solid #f1e7e7;
+			margin-top: 3px;
+		}
+
+		.crosCell {
+			background-color: #e3484822;
+			border: 1px solid #f1e7e7;
+			margin-top: 3px;
+		}
+		.fontb{
+			font-weight: bold;
+		}
+
+
+	</style>
+</head>
+
+<body>
+<div id="app">
+
+	<van-popup v-model="showPicker" position="bottom">
+		<van-datetime-picker
+				v-model="currentDate"
+				type="year-month"
+				title="选择年月日"
+				@confirm="onConfirm"
+
+		/>
+	</van-popup>
+
+	<van-nav-bar title="消防栓检查" @click-right="onClickRight">
+		<template #right>
+			{{currentDate1}}
+		</template>
+	</van-nav-bar>
+	<van-cell-group inset class="fontb" title = "基本信息">
+		<van-cell title="检查日期" v-model="hydrantLog.checkDate"></van-cell>
+		<van-cell title="编号" v-model="hydrantLog.code"></van-cell>
+		<van-cell title="位置" v-model="hydrantLog.position"></van-cell>
+		<van-cell title="属性" v-model="hydrantLog.attribute"></van-cell>
+	</van-cell-group>
+	<van-cell-group inset title = "消防栓">
+		<!--<van-cell title="消防栓"></van-cell>-->
+		<van-cell title="门锁" :class="{'succCell': hydrantLog.doorBolt==1 , 'crosCell': hydrantLog.doorBolt==0}">
+			<template #right-icon v-if="hydrantLog.doorBolt==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.doorBolt==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.box==1 , 'crosCell': hydrantLog.box==0  }" title="箱体">
+			<template #right-icon v-if="hydrantLog.box==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.box==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.waterHose==1 , 'crosCell': hydrantLog.waterHose==0  }" title="水带">
+			<template #right-icon v-if="hydrantLog.waterHose==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.waterHose==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.gunHead==1 , 'crosCell': hydrantLog.gunHead==0  }" title="枪头">
+			<template #right-icon v-if="hydrantLog.gunHead==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.gunHead==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.valve==1 , 'crosCell': hydrantLog.valve==0  }" title="阀门">
+			<template #right-icon v-if="hydrantLog.valve==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.valve==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.tube==1 , 'crosCell': hydrantLog.tube==0  }" title="软管">
+			<template #right-icon v-if="hydrantLog.tube==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.tube==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.hose==1 , 'crosCell': hydrantLog.hose==0  }" title="水喉">
+			<template #right-icon v-if="hydrantLog.hose==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.hose==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.pressureReducingPlate==1 , 'crosCell': hydrantLog.pressureReducingPlate==0  }" title="减压板">
+			<template #right-icon v-if="hydrantLog.pressureReducingPlate==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.pressureReducingPlate==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.manualAlarm==1 , 'crosCell': hydrantLog.manualAlarm==0  }" title="手动报警器">
+			<template #right-icon v-if="hydrantLog.manualAlarm==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.manualAlarm==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell>
+			<template>
+				<van-row>
+					<van-col v-for="item in hydrantLog.fileUrl1">
+						<van-image style="margin-left:2px"
+								width="100"
+								height="100"
+								:src="item"
+								@click="viewImage(hydrantLog.fileUrl1)"
+						/>
+					</van-col>
+				</van-row>
+			</template>
+		</van-cell>
+
+	</van-cell-group>
+	<van-cell-group inset title = "灭火器">
+		<!--<van-cell title="灭火器">
+		</van-cell>-->
+		<van-cell :class="{'succCell': hydrantLog.fireBox==1 , 'crosCell': hydrantLog.fireBox==0  }" title="灭火器箱体">
+			<template #right-icon v-if="hydrantLog.fireBox==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.fireBox==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.fireBottleBody==1 , 'crosCell': hydrantLog.fireBottleBody==0  }" title="灭火器瓶体">
+			<template #right-icon v-if="hydrantLog.fireBottleBody==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.fireBottleBody==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.fireMark==1 , 'crosCell': hydrantLog.fireMark==0  }" title="灭火器标识">
+			<template #right-icon v-if="hydrantLog.fireMark==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.fireMark==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.firePressure==1 , 'crosCell': hydrantLog.firePressure==0  }" title="灭火器压力">
+			<template #right-icon v-if="hydrantLog.firePressure==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.firePressure==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.fireLeadSeal==1 , 'crosCell': hydrantLog.fireLeadSeal==0  }" title="灭火器铅封">
+			<template #right-icon v-if="hydrantLog.fireLeadSeal==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.fireLeadSeal==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell :class="{'succCell': hydrantLog.fireTube==1 , 'crosCell': hydrantLog.fireTube==0  }" title="灭火器软管">
+			<template #right-icon v-if="hydrantLog.fireTube==1">
+				<van-icon name="success" class="succ"/>
+			</template>
+			<template #right-icon v-else-if="hydrantLog.fireTube==0">
+				<van-icon name="cross" class="cros"/>
+			</template>
+		</van-cell>
+		<van-cell title="灭火器数量" v-model="hydrantLog.fireNum"></van-cell>
+		<van-cell>
+			<template>
+				<van-row>
+					<van-col v-for="item in hydrantLog.fileUrl2">
+						<van-image style="margin-left:2px"
+								   width="100"
+								   height="100"
+								   :src="item"
+								   @click="viewImage(hydrantLog.fileUrl2)"
+						/>
+					</van-col>
+				</van-row>
+			</template>
+		</van-cell>
+
+	</van-cell-group>
+	<van-cell-group inset title = "其它">
+		<van-cell title="备注" v-model="hydrantLog.common"></van-cell>
+		<van-cell title="检查人" v-model="hydrantLog.checkUserName"></van-cell>
+	</van-cell-group>
+
+
+</div>
+
+<!-- 引入 Vue 和 Vant 的 JS 文件 -->
+<script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/2.6.14/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vant/2.13.2/vant.min.js"></script>
+<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/axios/0.26.0/axios.min.js"></script>
+
+<script>
+    _timeFormat = function (time, pattern) { // 时间格式化 2019-09-08
+        console.log(time, "++")
+        var time = new Date(time);
+        let year = time.getFullYear();
+        let month = time.getMonth() + 1;
+        let day = time.getDate();
+        let h = time.getHours();
+        h = h < 10 ? ('0' + h) : h;
+        let minutes = time.getMinutes();
+        minutes = minutes < 10 ? ('0' + minutes) : minutes;
+        if (pattern == 'yyyy-MM') {
+            return year + '-' + month;
+        }
+        return year + '-' + month + '-' + day
+    };
+    // 初始化 Vue 实例
+    var vue = new Vue({
+        el: '#app',
+        data() {
+            return {
+                currentDate: new Date(),
+                showPicker: false,
+                currentDate1: _timeFormat(new Date(),'yyyy-MM'),
+                hydrantLog: {
+                    checkDate: _timeFormat(new Date()),
+                    code: "0",
+                    position: "",
+                    attribute: "公众",
+                    checkUserName: "",
+                    doorBolt: 0,
+                    box: 1,
+                    waterHose: 0,
+                    gunHead: 0,
+                    valve: 0,
+                    tube: 0,
+                    hose: 0,
+                    pressureReducingPlate: 0,
+                    manualAlarm: 0,
+                    fileUrl1: [],
+                    fireExtinguisher: 0,
+                    fireBox: 0,
+                    fireBottleBody: 0,
+                    fireMark: 0,
+                    firePressure: 0,
+                    fireLeadSeal: 0,
+                    fireTube: 0,
+                    fireNum: 0,
+                    fileUrl2: [],
+                    common: "",
+                    checkUserName: 0,
+                    fireNum: 0
+                }
+            };
+        },
+
+        methods: {
+            onClickRight() {
+                this.showPicker = true;
+            },
+            onConfirm(date) {
+                this.currentDate1 = _timeFormat(date.getTime(),'yyyy-MM');
+                this.showPicker = false;
+                this.getData();
+            },
+            viewImage(e) {
+                vant.ImagePreview(e);
+            },
+            getData() {
+                const params = new URLSearchParams(location.search)
+                let id = params.get('hydrantId');
+                let baseUrl = location.origin;
+                // 发起 GET 请求
+                axios.get(baseUrl+'/yunshang/hydrant/check-log/getCheckLog?hydrantId='+id+'&queryDate='+this.currentDate1)
+                    .then(response => {
+                        // 请求成功处理
+                        console.log(response.data);
+                        this.hydrantLog = response.data.data
+                        this.hydrantLog.fileUrl1 = response.data.data.fileUrl1.split(",")
+                        this.hydrantLog.fileUrl2 = response.data.data.fileUrl2.split(",")
+                    })
+                    .catch(error => {
+                        // 请求失败处理
+                        console.error(error);
+                    });
+            },
+
+        }
+    });
+    vue.getData();
+</script>
+</body>
+</html>
